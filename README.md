@@ -1,27 +1,31 @@
 # AngularCliAotBug
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 6.0.0.
+This project is a demo to show an error detected using ng serve with AOT enabled.
 
-## Development server
+## Environment
+The app.component.html uses a variable that doesn't exists in app.component.ts: {{missingVariable}}.
+If you compile the project with AOT enabled an error is shown: ERROR in src/app/app.component.html(3,7): : Property 'missingVariable' does not exist on type 'AppComponent'.
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+## Problem
+The problem using ng serve is that after this compilation error the files are not refreshed after changes with the server running. So although you remove the {{missingVariable}} to fix the compilation error, the server is not reloaded.
 
-## Code scaffolding
+Step by step:
+1. Run ng serve.
+2. See the compilation error.
+3. Remove the {{missingVariable}} part in app.component.html.
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+The server is not reloaded, it doesn't refresh after the changes.
+The expected behaviour is the server refreshing after saving changes.
 
-## Build
+I have found that if the first time you run ng serve there are no compilation errors, and later some compilation error occurs, when you add more changes to the files the server reloads fine.
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `--prod` flag for a production build.
+Step by step:
+1. Remove the {{missingVariable}} part in app.component.html.
+2. Run ng serve.
+3. See no compilation errors.
+4. Add {{missingVariable}} again to app.component.html.
+5. See the compilation error.
+6. Remove the {{missingVariable}} part in app.component.html once more.
+7. See the server has reloaded with no compilation error.
 
-## Running unit tests
-
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
-
-## Running end-to-end tests
-
-Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protractortest.org/).
-
-## Further help
-
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI README](https://github.com/angular/angular-cli/blob/master/README.md).
+This is the expected behaviour when after ng serve some compilation error occurs.
